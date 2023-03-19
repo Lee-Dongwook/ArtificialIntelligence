@@ -99,4 +99,16 @@ for w in layer1.w_history:
 plt.plot(w2,w3)
 plt.plot(w2[-1],w3[-1],'ro')
 plt.plot(w2[-5],w3[-5],'ro')
-plt.show()
+
+train_mean = np.mean(x_train, axis = 0)
+train_std = np.std(x_train, axis=0)
+x_train_scaled = (x_train-train_mean) / train_std
+
+val_mean = np.mean(x_val, axis=0)
+val_std = np.std(x_val, axis=0)
+x_val_scaled = (x_val - val_mean) / val_std
+
+layer2 = SingleLayer()
+layer2.fit(x_train_scaled, y_train)
+print(layer2.score(x_val_scaled, y_val))
+
