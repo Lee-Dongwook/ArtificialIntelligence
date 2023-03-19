@@ -96,9 +96,9 @@ for w in layer1.w_history:
     w2.append(w[2])
     w3.append(w[3])
 
-plt.plot(w2,w3)
-plt.plot(w2[-1],w3[-1],'ro')
-plt.plot(w2[-5],w3[-5],'ro')
+# plt.plot(w2,w3)
+# plt.plot(w2[-1],w3[-1],'ro')
+# plt.plot(w2[-5],w3[-5],'ro')
 
 train_mean = np.mean(x_train, axis = 0)
 train_std = np.std(x_train, axis=0)
@@ -112,3 +112,59 @@ layer2 = SingleLayer()
 layer2.fit(x_train_scaled, y_train)
 print(layer2.score(x_val_scaled, y_val))
 
+#과대 적합 , 과소 적합
+
+# layer3 = SingleLayer()
+# layer3.fit(x_train_scaled, y_train, x_val = x_val_scaled, y_val = y_val)
+# plt.ylim(0, 0.3)
+# plt.xlim(0,100)
+# plt.plot(layer3.losses)
+# plt.plot(layer3.val_losses)
+# plt.ylabel('loss')
+# plt.xlabel('epoch')
+# plt.legend(['train_loss','val_loss'])
+# plt.show()
+
+
+# 규제
+# l1_list = [0.0001, 0.001, 0.01]
+# for l1 in l1_list:
+#     lyr = SingleLayer(l1 = l1)
+#     lyr.fit(x_train_scaled, y_train, x_val = x_val_scaled, y_val=y_val)
+    
+#     plt.plot(lyr.losses)
+#     plt.plot(lyr.val_losses)
+#     plt.title('Learning Curve (l1={})'.format(l1))
+#     plt.ylabel('loss')
+#     plt.xlabel('epoch')
+#     plt.legend(['train_loss','val_loss'])
+#     plt.ylim(0,0.3)
+#     plt.xlim(0,100)
+#     plt.show()
+
+
+# 교차 검증
+validation_scores = []
+k = 10
+bins = len(x_train_all) // k
+
+for i in range(k):
+    start = i*bins
+    end = (i+1)*bins
+    val_fold = x_train_all[start:end]
+    val_target = y_train_all[start:end]
+    
+    train_index = list(range(0,start)) + list(range(end, len(x_train_all)))
+    train_fold = x_train_all[train_index]
+    train_target = y_train_all[train_index]
+    
+    train_mean = np.mean(train_fold, axis=0)
+    train_std = np.std(train_fold, axis=0)
+    train_fold_scaled = (train_fold - train_mean) / train_std
+    val_fold_scaled = (val_fold - train_mean) / train_std
+    
+    lyr = SingleLayer(l2 = 0.01)
+    lyr.fit(train_fold_scaled, train_target, epochs = 50)
+    score = lyr.score(val_fold_scaled, val_target)
+    validation_scores.append(score)
+print(np.mean(validation_scores))
